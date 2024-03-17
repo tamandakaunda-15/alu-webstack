@@ -49,3 +49,4 @@ backend tamandakaunda-backend
         balance roundrobin
         server 6038-web-01 52.201.214.199:80 check
         server 6038-web-02 50.19.74.156:80 check
+
