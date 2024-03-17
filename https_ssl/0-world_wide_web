@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Function to perform DNS lookup and use awk for formatting
+perform_dns_lookup() {
+    local domain="$1"
+    local subdomain="$2"
+
+    # Use dig to perform DNS lookup and format the output using awk
+    dig +short "$subdomain.$domain" | awk -v subdomain="$subdomain" \
+        '{if ($0 == "") print "No record found for " subdomain; else print "The subdomain " subdomain " is a A record and points to " $0}'
+}
+
+# Main script
+main() {
+    local domain="$1"
+    local subdomain="$2"
+
+    # Default subdomains order
+    subdomains=("www" "lb-01" "web-01" "web-02")
+
+    if [ -z "$subdomain" ]; then
+        # If no specific subdomain provided, loop through default subdomains
+        for sub in "${subdomains[@]}"; do
+            perform_dns_lookup "$domain" "$sub"
+        done
+    else
+        # If a specific subdomain is provided, perform DNS lookup for that subdomain only
+        perform_dns_lookup "$domain" "$subdomain"
+    fi
+}
+
+# Check if required arguments are provided
+if [ "$#" -lt 1 ]; then
+    echo "Usage: $0 <domain> [subdomain]"
+    exit 1
+fi
+
+main "$1" "$2"
